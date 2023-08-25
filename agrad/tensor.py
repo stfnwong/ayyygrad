@@ -1,6 +1,6 @@
 # A Tensor
 
-from typing import Any, Optional, Self
+from typing import Optional, Self, Union
 from collections import namedtuple
 import numpy as np
 
@@ -12,10 +12,10 @@ Children = namedtuple("Children", ["a", "b", "op"])
 class Tensor:
     def __init__(
         self,
-        value: Optional[float]=None,
+        value: Optional[Union[float, np.ndarray]]=None,
         children: Optional[Children]=None,
     ):
-        self.value: Optional[float] = value
+        self.value: Optional[Union[float, np.ndarray]] = value
         self.children = children
 
     def __repr__(self) -> str:

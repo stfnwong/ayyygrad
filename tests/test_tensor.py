@@ -33,7 +33,7 @@ def test_tensor_grad():
     b = Tensor(None)
 
     z1 = a + b
-    z2  = z1 * b
+    z2 = z1 * b
 
     # Before we compute the gradient these should be empty
     assert a.value == None
@@ -64,3 +64,14 @@ def test_tensor_larger_comp_graph():
 
     assert float_eq(za.value, -3.34729777301069)
     assert float_eq(zb.value, -9.70176956641438)
+
+    # Check against a symbolic implementation
+    import sympy as sym
+
+    xs = sym.Symbol("xs")
+    ys = sym.Symbol("ys")
+    zs = (12 - (xs * sym.exp(ys))) / (45 + ((xs * ys) * sym.exp(-xs)))
+
+    d = zs.diff(ys)
+    assert float_eq(zs.diff(xs).evalf(subs={xs: 3, ys: 5}), za.value)
+    assert float_eq(zs.diff(ys).evalf(subs={xs: 3, ys: 5}), zb.value)
