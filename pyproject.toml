@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "agrad"
+version = "0.1.0"
+description = "AUTOGRAD"
+authors = ["Stefan Wong <stfnwong@gmail.com>"]
+license = "NAY"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.25.2"
+
+[tool.poetry.group.dev.dependencies]
+pudb = "^2022.1.3"
+ipython = "^8.14.0"
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
