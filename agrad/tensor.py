@@ -1,4 +1,4 @@
-# A Tensor 
+# A Tensor
 
 from typing import Any, Optional, Self
 from collections import namedtuple
@@ -24,7 +24,8 @@ class Tensor:
     def __add__(self, other: Self) -> Self:
         c = Children(self, other, np.add)
         t = Tensor(children=c)
-        return t
+
+        return t.forward()
 
     def __mul__(self, other: Self) -> Self:
         c = Children(self, other, np.multiply)
@@ -46,3 +47,25 @@ class Tensor:
             self.value = self.children.op(a.value, b.value)
 
         return self
+
+    def grad(self, derive_to: Self) -> Self:
+        # Derivative of a Tensor with itself is 1
+        if self is derive_to:
+            return Tensor(1)
+
+        # Derivative of a scalar with a Tensor is 0
+        if self.children is None:
+            return Tensor(0)
+
+        # Recursively find derivatives for child nodes
+        if self.children.op is np.add:    # (a + b)' = a' + b'
+            t = self.children.a.grad(derive_to) + self.children.b.grad(derive_to)
+        elif self.children.op is np.multiply:    # (ab)' = a'b + ab'
+            t = self.children.a.grad(derive_to) * self.children.b + self.children.a * self.children.b.grad(derive_to)
+        else:
+            raise NotImplementedError(f"Op [{self.children.op}] not implemented")
+
+        return t
+
+
+
