@@ -1,6 +1,11 @@
 from agrad.tensor import Tensor
 
 
+def float_eq(a: float, b: float, eps:float=1e-6) -> bool:
+    return True if abs(a - b) < eps else False
+
+
+
 def test_tensor_add():
     a = Tensor(3)
     b = Tensor(4)
@@ -45,3 +50,17 @@ def test_tensor_grad():
     g = z2.grad(b)
     assert g.value == 13
 
+
+def test_tensor_larger_comp_graph():
+    a = Tensor(3)
+    b = Tensor(5)
+
+    # Find the graph of the expression 
+    # z = (12 - (x * exp(y))) / (45 + x * y * exp(-x))
+
+    z = (Tensor(12) - (a * b.exp())) / (Tensor(45) + a * b * (-a).exp())
+    za = z.grad(a)
+    zb = z.grad(b)
+
+    assert float_eq(za.value, -3.34729777301069)
+    assert float_eq(zb.value, -9.70176956641438)
