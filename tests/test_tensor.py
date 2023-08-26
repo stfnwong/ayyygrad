@@ -1,4 +1,4 @@
-from agrad.tensor import Tensor
+from ayyygrad.tensor import Tensor
 
 
 def float_eq(a: float, b: float, eps:float=1e-6) -> bool:
