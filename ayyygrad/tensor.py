@@ -8,15 +8,16 @@ import numpy as np
 Children = namedtuple("Children", ["a", "b", "op"])
 
 
-
 class Tensor:
     def __init__(
         self,
         value: Optional[Union[float, np.ndarray]]=None,
         children: Optional[Children]=None,
+        label:Optional[str]=None
     ):
         self.value: Optional[Union[float, np.ndarray]] = value
         self.children = children
+        self.label = label
 
     def __repr__(self) -> str:
         return f"T:{self.value}"

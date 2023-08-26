@@ -5,4 +5,5 @@ __pycache__
 # Ignore object files 
 *.o
 
-
+# Ignore notebooks (we keep percent files instead)
+*.ipynb
