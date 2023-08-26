@@ -1,7 +1,7 @@
 # This is a Karpathy style node ala Micrograd 
 
 
-from typing import Callable, Self, Set, Tuple
+from typing import Callable, Self, Set, Tuple, Union
 # This only works for scalar values so we don't need numpy yet 
 import math
 
@@ -23,18 +23,23 @@ class Value:
     def __repr__(self) -> str:
         return f"Value(data={self.data})"
 
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: Union[float, Self]) -> Self:
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), "+")
 
         def back():
-            self.grad += 1.0 * out.grad
-            other.grad += 1.0 * out.grad
+            self.grad += out.grad
+            other.grad += out.grad
 
         out.back = back
 
         return out
 
-    def __mul__(self, other: Self) -> Self:
+    def __radd__(self, other: Self) -> Self:
+        return self + other
+
+    def __mul__(self, other: Union[float, Self]) -> Self:
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data * other.data, (self, other), "+")
 
         def back():
@@ -44,6 +49,18 @@ class Value:
         out.back = back
 
         return out
+
+    def __rmul__(self, other: Self) -> Self:
+        return self * other
+
+    def __neg__(self) -> Self:
+        return self * -1.0
+
+    def __sub__(self, other: Self) -> Self:
+        return self + (-other)
+
+    def __rsub__(self, other: Self) -> Self:
+        return other + (-self)
 
     def tanh(self) -> Self:
         x = self.data
@@ -72,4 +89,4 @@ class Value:
 
         self.grad = 1.0
         for node in reversed(topo):
-            node.backward()
+            node.back()

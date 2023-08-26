@@ -33,7 +33,10 @@ def draw(root: Value):
         uid = str(id(n))
 
         # Make a rectangle for each of the nodes
-        dot.node(name=uid, label=f"{n.label} | data: {n.data:.4f}", shape="record")
+        dot.node(
+            name=uid,
+            label=f"{n.label} | data: {n.data:.4f} | grad: {n.grad:.4f}",
+            shape="record")
 
         if n.op:
             dot.node(name=uid + n.op, label=n.op)

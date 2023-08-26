@@ -23,7 +23,6 @@ import os, sys
 if ".." not in sys.path:
     sys.path.insert(0, "..")
 
-
 # %%
 # EXPLANATORY TEXT GOES HERE 
 # 
@@ -59,3 +58,25 @@ L.label = "L"
 from ayyygrad.viz import draw
 
 draw(L)
+
+# %%
+# If we call backward() on L then the graph should update
+L.backward()
+
+draw(L)
+
+# %%
+# Try another network
+
+x = Value(-2.0, label="x")
+y = Value(3.0, label="y")
+
+xx = x * y; xx.label = "xx"
+yy = x + y; yy.label = "yy"
+
+z = xx * yy
+z.backward()
+
+draw(z)
+
+# %%
