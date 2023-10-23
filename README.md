@@ -1,4 +1,11 @@
-# Some simple Autograd
+# AYYYGRAD
+Dumb Autograd.
+
+In a previous version this really only worked for tree-like computation graphs. This one now makes everything a DAG and does it properly.
+
+
+_NOTE:_ I actually don't like this implementation that much so I am changing it, most of my ideas are actually ideas from `Micrograd` and `Tinygrad` because I am a fraud.
+
 
 This is a quick run through automatic differentiation based on [this](https://vmartin.fr/understanding-automatic-differentiation-in-30-lines-of-python.html) blogpost.
 

@@ -2,16 +2,11 @@
 
 
 from typing import Tuple
-from ayyydz.tensor import Tensor
+import numpy as np
 
+# TODO: where should Function go?
+from ayyygrad.tensor import Function,Tensor
 
-
-class Function:
-    def forward(self, *args, **kwargs):
-        raise NotImplemented(f"forward() not implemented for {type(self)}")
-
-    def backward(self, *args, **kwargs):
-        raise NotImplemented(f"backward() not implemented for {type(self)}")
 
 
 
@@ -20,38 +15,30 @@ class Add(Function):
     def forward(self, x: Tensor, y: Tensor) -> Tensor:
         return x + y
 
-    def backward(self, dz: Tensor) -> Tensor:
-        return dz
-
-
-class Sub(Function):
-    def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        return x - y
-
-    def backward(self, dz: Tensor) -> Tensor:
-        return dz
+    def backward(self, dz: Tensor) -> Tuple[Tensor, ...]:
+        return (dz, dz)
 
 
 class Mul(Function):
     def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        self.x = x
-        self.y = y
+        self.save(x, y)
         return x * y
 
     def backward(self, dz: Tensor) -> Tuple[Tensor, Tensor]:
-        dx = self.x * dz
-        dy = self.y * dz
+        x, y = self.saved_tensors
+        dx = x * dz
+        dy = y * dz
 
         return (dx, dy)
 
 
-class Div(Function):
-    def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        self.x = x
-        self.y = y
-        return x / y
+class ReLU(Function):
+    def forward(self, x: Tensor) -> Tensor:
+        self.save(x)
+        return np.maximum(0, x)
 
     def backward(self, dz: Tensor) -> Tensor:
-        pass
-
+        x, = self.saved_tensors
+        g = dz.copy()
+        g[x < 0] = 0
 
