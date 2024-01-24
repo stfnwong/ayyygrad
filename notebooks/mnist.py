@@ -21,6 +21,9 @@
 # %autoreload 2
 
 # %%
+from tqdm import trange
+
+# %%
 # Try to do mnist from scratch
 import numpy as np
 
@@ -85,5 +88,50 @@ print(X_train[0].shape)
 plt.imshow(X_train[0])
 
 # %%
+# Add a classifier 
+
+import torch.nn as nn
+from torch import Tensor
+
+class TestNet(nn.Module):
+    def __init__(self):
+        super(TestNet, self).__init__()
+        self.l1 = nn.Linear(784, 128)
+        self.relu = nn.ReLU()
+        self.l2 = nn.Linear(128, 10)
+
+    def forward(self, X: Tensor) -> Tensor:
+        X = self.l1(X)
+        X = self.relu(X)
+        X = self.l2(X)
+        
+        return X
+
+model = TestNet()
+
+# %%
+# Train it 
+
+import torch
+
+batch_size = 32
+max_iter = 100
+
+loss_func = nn.CrossEntropyLoss()
+optim = torch.optim.Adam(model.parameters())
+
+
+for iter in (t := trange(max_iter)):
+    samp = np.random.randint(0, X_train.shape[0], size=(batch_size))
+    X = torch.tensor(X_train[samp].reshape((-1, 28 * 28))).float()
+    Y = torch.tensor(Y_train[samp]).long()
+    optim.zero_grad()
+    out = model(X)
+    cat = torch.argmax(out, dim=1)
+    acc = (cat == Y).float().mean()
+    loss = loss_func(out, Y)
+    loss.backward()
+    optim.step()
+    t.set_description(f"Loss: {loss.item()}, Acc: {acc.item()}")
 
 # %%
