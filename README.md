@@ -37,6 +37,15 @@ deactivate
 
 to turn it off.
 
+Note that even the current version of `poetry` (version `1.7.1` in my case) has that 
+annoying issue where it bothers you for keychain data just to add to remove packages 
+(ie: it bothers you even when you aren't publishing). The workaround where you set the
+keyring to the Null Keyring still works. To do that run
+
+`export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`
+
+and then try adding/updating/etc whatever through `poetry`.
+
 
 ## Notebooks
 There are some notebooks in the `notebooks` folder. These are all in `percent` script format. If like me you are working locally and can't be bothered with security then you can start the notebook by 

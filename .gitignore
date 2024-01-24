@@ -7,3 +7,6 @@ __pycache__
 
 # Ignore notebooks (we keep percent files instead)
 *.ipynb
+
+# Ignore any virtual env folders
+.venv/
