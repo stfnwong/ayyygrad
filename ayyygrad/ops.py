@@ -11,13 +11,6 @@ from ayyygrad.tensor import Function,Tensor
 
 
 
-class Add(Function):
-    def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        return x + y
-
-    def backward(self, dz: Tensor) -> Tuple[Tensor, ...]:
-        return (dz, dz)
-
 
 class Mul(Function):
     def forward(self, x: Tensor, y: Tensor) -> Tensor:
@@ -30,6 +23,11 @@ class Mul(Function):
         dy = y * dz
 
         return (dx, dy)
+
+class Exp(Function):
+    def forward(self, x: Tensor) -> Tensor:
+        self.save(np.exp(x))
+        return np.exp(x)
 
 
 class ReLU(Function):

@@ -1,6 +1,6 @@
 # A Tensor
 
-from typing import Optional, Self, Union
+from typing import Optional, Self, Tuple, Union
 from collections import namedtuple
 import numpy as np
 import copy
@@ -26,16 +26,36 @@ class Tensor:
 
         self.grad: Optional[Self]=None
 
+
+    def __add__(self, X: Union[Self, float]) -> Self:
+        return self.add(X)
+
     # Operator overloads 
-    def __mul__(self, X: Union[Tensor, float]) -> Self:
+    def __mul__(self, X: Union[Self, float]) -> Self:
         # TODO: in tinygrad we call apply here 
         # eg: ops.Mul.apply(*self.broadcasted_(X)) 
         # full path is something like:  mul.apply() if X is Tensor else self.mul(1/X)
-        pass
+        return self.mul(X)
+
+    def __div__(self, X: Union[Self, float]) -> Self:
+        return self.div(X)
 
     # Arithmetic ops
+    # TODO: forget about more indirection for now, that can come when there are multiple backends
+    def add(self, other: Self) -> Self:
+        return self.data + other.data
+
+    def sub(self, other: Self) -> Self:
+        return self.data - other.data
+
     def mul(self, other: Self) -> Self:
-        pass
+        return self.data * other.data
+
+    def div(self, other: Self) -> Self:
+        return self.data / other.data
+
+    def dot(self, other: Self) -> Self:
+        return np.dot(self.data, other.data)
 
     def copy(self) -> Self:
         return copy.copy(self)
@@ -47,17 +67,52 @@ class Tensor:
 
 class Function:
     def __init__(self, *tensors: Tensor):
+        #self.parents: Tuple[Tensor] = tensors
         self.parents = tensors
         self.saved_tensors = []
+        self.ret = None
+
+    def __call__(self, *args, **kwargs) -> Tensor:
+        return self.forward(*args, **kwargs)
 
     def save(self, *tensors: Tensor) -> None:
         self.saved_tensors.extend(tensors)
 
     def forward(self, *args, **kwargs):
-        raise NotImplemented(f"forward() not implemented for {type(self)}")
+        raise NotImplemented(f"forward() not implemented for type {type(self)}")
 
     def backward(self, *args, **kwargs):
-        raise NotImplemented(f"backward() not implemented for {type(self)}")
+        raise NotImplemented(f"backward() not implemented for type {type(self)}")
+
+    def zero_grad(self):
+        self.gradient = 0
+
+
+
+
+# TODO: move this somewhere else
+class Add(Function):
+    def forward(self, x: Tensor, y: Tensor) -> Tensor:
+        self.saved_tensors.append(x + y)
+        return self.saved_tensors[-1]
+        #self.cache = x + y
+        #return self.cache   # TODO: standardize somehow
+
+    def backward(self, dz: Tensor) -> Tuple[Tensor, ...]:
+        return (dz, dz)
+
+
+class Sub(Function):
+    def forward(self, x: Tensor, y: Tensor) -> Tensor:
+        self.saved_tensors.append(x - y)
+        return self.saved_tensors[-1]
+        #self.cache = x - y
+        #return self.cache
+
+    def backward(self, dz: Tensor) -> Tuple[Tensor, ...]:
+        return (dz, dz)
+
+
 
 
 

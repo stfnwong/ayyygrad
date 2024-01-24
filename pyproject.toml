@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "agrad"
+name = "ayyygrad"
 version = "0.1.0"
 description = "AUTOGRAD"
 authors = ["Stefan Wong <stfnwong@gmail.com>"]
