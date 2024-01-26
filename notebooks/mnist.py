@@ -22,6 +22,7 @@
 
 # %%
 from tqdm import trange
+import matplotlib.pyplot as plt
 
 # %%
 # Try to do mnist from scratch
@@ -107,7 +108,6 @@ class TestNet(nn.Module):
         
         return X
 
-model = TestNet()
 
 # %%
 # Train it 
@@ -115,16 +115,21 @@ model = TestNet()
 import torch
 
 batch_size = 32
-max_iter = 100
+max_iter = 200
+lr = 0.002
+# Track loss and accuracy over the training run
+loss_hist = []
+acc_hist = []
 
+model = TestNet()
 loss_func = nn.CrossEntropyLoss()
-optim = torch.optim.Adam(model.parameters())
-
+optim = torch.optim.Adam(model.parameters(), lr=lr)
 
 for iter in (t := trange(max_iter)):
     samp = np.random.randint(0, X_train.shape[0], size=(batch_size))
-    X = torch.tensor(X_train[samp].reshape((-1, 28 * 28))).float()
+    X = torch.tensor(X_train[samp].reshape((-1, 28*28))).float()
     Y = torch.tensor(Y_train[samp]).long()
+    
     optim.zero_grad()
     out = model(X)
     cat = torch.argmax(out, dim=1)
@@ -132,6 +137,21 @@ for iter in (t := trange(max_iter)):
     loss = loss_func(out, Y)
     loss.backward()
     optim.step()
-    t.set_description(f"Loss: {loss.item()}, Acc: {acc.item()}")
+
+    loss_hist.append(loss.item())
+    acc_hist.append(acc.item())
+    
+    t.set_description(f"Loss: {loss_hist[-1]}, Acc: {acc_hist[-1]}")
+
+#plt.ylim(-0.1, 2.0)
+plt.plot(loss_hist)
+plt.plot(acc_hist)
+plt.legend(["Loss History", "Accuracy History"])
+plt.xlabel("Iteration")
+
 
 # %%
+# Evaluate 
+out = model(torch.tensor(X_test.reshape((-1, 28*28))).float())
+ytest_preds = torch.argmax(out, dim=1).numpy()
+(ytest_preds == Y_test).mean()
