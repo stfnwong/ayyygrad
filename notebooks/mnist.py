@@ -115,7 +115,7 @@ class TestNet(nn.Module):
 import torch
 
 batch_size = 32
-max_iter = 200
+max_iter = 1000
 lr = 0.002
 # Track loss and accuracy over the training run
 loss_hist = []
@@ -148,10 +148,46 @@ plt.plot(loss_hist)
 plt.plot(acc_hist)
 plt.legend(["Loss History", "Accuracy History"])
 plt.xlabel("Iteration")
-
+plt.title("A very basic MNIST classifier")
 
 # %%
 # Evaluate 
 out = model(torch.tensor(X_test.reshape((-1, 28*28))).float())
 ytest_preds = torch.argmax(out, dim=1).numpy()
 (ytest_preds == Y_test).mean()
+
+# %%
+model.l1.weight.shape, model.l2.weight.shape
+
+# %%
+# Now can we do this with just numpy?
+
+l1 = np.zeros((784, 128), dtype=np.float32)
+l2 = np.zeros((128, 10), dtype=np.float32)
+l1.shape, l2.shape
+
+# %%
+l1[:] = model.l1.weight.detach().numpy().transpose()
+l2[:] = model.l2.weight.detach().numpy().transpose()
+l1.shape, l2.shape
+
+
+# %%
+# Forward pass
+
+def forward(x: np.ndarray) -> np.ndarray:
+    x = x.dot(l1)
+    print(x)
+    x = np.maximum(x, 0)
+    print(x)
+    x = x.dot(l2)
+    
+    return x
+
+
+# %%
+forward(X_test.reshape((-1, 28*28)))
+
+# %%
+
+# %%
